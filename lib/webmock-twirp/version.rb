@@ -1,3 +1,3 @@
-module MY_NEW_GEM
+module webmock-twirp
   VERSION = "0.0.0"
 end

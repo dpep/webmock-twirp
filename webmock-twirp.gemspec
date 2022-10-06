@@ -1,7 +1,7 @@
 package_name = File.basename(__FILE__).split(".")[0]
 load Dir.glob("lib/**/version.rb")[0]
 
-package = MY_NEW_GEM
+package = webmock-twirp
 
 
 Gem::Specification.new do |s|
