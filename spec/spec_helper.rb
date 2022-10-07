@@ -1,6 +1,8 @@
 require "byebug"
 require "rspec"
+require "rspec/matchers/fail_matchers"
 require "simplecov"
+require "webmock/rspec"
 
 SimpleCov.start do
   add_filter "spec/"
@@ -25,4 +27,4 @@ RSpec.configure do |config|
   end
 end
 
-# Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
+Dir["./spec/support/**/*.rb"].sort.each { |f| require f }

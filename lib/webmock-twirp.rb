@@ -1,5 +1,1 @@
-require "webmock-twirp/version"
-
-module webmock-twirp
-
-end
+require "webmock/twirp"

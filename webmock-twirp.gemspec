@@ -1,7 +1,7 @@
 package_name = File.basename(__FILE__).split(".")[0]
 load Dir.glob("lib/**/version.rb")[0]
 
-package = webmock-twirp
+package = WebMock::Twirp
 
 
 Gem::Specification.new do |s|
@@ -14,7 +14,9 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
 
   s.files       = Dir.glob("lib/**/*")
-  s.test_files  = Dir.glob("spec/**/*_spec.rb")
+
+  s.add_dependency "webmock", ">= 3"
+  s.add_dependency "twirp", ">= 1"
 
   s.add_development_dependency "byebug"
   s.add_development_dependency "codecov"
