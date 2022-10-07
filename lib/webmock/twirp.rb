@@ -18,9 +18,9 @@ module WebMock
         )
       end
 
-      def a_twirp_request(uri)
-        WebMock::RequestPattern.new(:post, uri)
-      end
+      # def a_twirp_request(uri)
+      #   WebMock::RequestPattern.new(:post, uri)
+      # end
     end
   end
 end

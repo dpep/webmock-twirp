@@ -1,7 +1,7 @@
 describe "stub_twirp_request" do
   let(:client) { EchoClient.new("http://localhost/twirp") }
-  let(:request) { EchoRequest.new(msg: "Ale") }
-  let(:response) { EchoResponse.new(msg: "response") }
+  let(:request) { EchoRequest.new(msg: "woof") }
+  let(:response) { EchoResponse.new(msg: "woof") }
   let(:error) { Twirp::Error.new(:not_found, "Not There") }
 
   def rpc
@@ -9,10 +9,6 @@ describe "stub_twirp_request" do
   end
 
   after do
-    # WebMock::StubRegistry.instance.request_stubs.each do |stub|
-    #   expect(stub).to have_been_requested
-    # end
-
     if @stub
       rpc
       expect(@stub).to have_been_requested
@@ -25,11 +21,11 @@ describe "stub_twirp_request" do
 
   describe ".with" do
     it "matches attributes" do
-      @stub = stub_twirp_request(client, :echo).with(msg: "Ale")
+      @stub = stub_twirp_request(client, :echo).with(msg: "woof")
     end
 
     it "matches an attribute regex" do
-      @stub = stub_twirp_request(client, :echo).with(msg: /^A/)
+      @stub = stub_twirp_request(client, :echo).with(msg: /^wo+/)
     end
 
     it "matches proto messages" do
@@ -39,13 +35,13 @@ describe "stub_twirp_request" do
     it "supports block mode" do
       @stub = stub_twirp_request(client, :echo).with do |request|
         expect(request).to be_a(EchoRequest)
-        expect(request.msg).to eq "Ale"
+        expect(request.msg).to eq "woof"
       end
     end
 
     it "does not catch mismatches" do
-      stub_twirp_request(client, :echo).with(msg: "Alex")
-      stub_twirp_request(client, :echo).with(msg: /Axe/)
+      stub_twirp_request(client, :echo).with(msg: "rav")
+      stub_twirp_request(client, :echo).with(msg: /rav/)
       stub_twirp_request(client, :echo).with(EchoRequest.new)
       stub_twirp_request(client, :echo).with { false }
 
@@ -62,13 +58,13 @@ describe "stub_twirp_request" do
     end
 
     it "supports attributes" do
-      @stub = stub_twirp_request(client, :echo).to_return(msg: "woot")
-      expect(rpc.data.msg).to eq "woot"
+      @stub = stub_twirp_request(client, :echo).to_return(msg: "rav")
+      expect(rpc.data.msg).to eq "rav"
     end
 
     it "supports proto messages" do
       @stub = stub_twirp_request(client, :echo).to_return(response)
-      expect(rpc.data.msg).to eq "response"
+      expect(rpc.data.msg).to eq response.msg
     end
 
     it "supports Twirp errors" do
@@ -117,7 +113,7 @@ describe "stub_twirp_request" do
 
       it "supports proto messages" do
         @stub = stub_twirp_request(client, :echo).to_return { response }
-        expect(rpc.data.msg).to eq "response"
+        expect(rpc.data.msg).to eq response.msg
       end
 
       it "supports Twirp errors" do
@@ -140,6 +136,4 @@ describe "stub_twirp_request" do
       end
     end
   end
-
-  # expect(a_twirp_request(/echo/)).to have_been_made
 end
