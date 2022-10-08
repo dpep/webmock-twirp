@@ -27,6 +27,12 @@ describe "stub_twirp_request" do
     @stub = stub_twirp_request(EchoService)
   end
 
+  it "catches bogus input" do
+    expect {
+      stub_twirp_request(Object)
+    }.to raise_error(TypeError, /expected Twirp Client or Service/)
+  end
+
   context "when a specific rpc method is specified" do
     it "stubs a specific twirp request" do
       @stub = stub_twirp_request(client, :echo)
@@ -75,6 +81,18 @@ describe "stub_twirp_request" do
       stub_twirp_request(client).with { false }
 
       expect { rpc }.to raise_error(WebMock::NetConnectNotAllowedError)
+    end
+
+    it "does not permit a request and attrs" do
+      expect {
+        stub_twirp_request(client).with(request, **request.to_h)
+      }.to raise_error(ArgumentError, /specify request or attrs/)
+    end
+
+    it "type checks the request param" do
+      expect {
+        stub_twirp_request(client).with(Object)
+      }.to raise_error(TypeError, /to be Protobuf::MessageExts/)
     end
   end
 
@@ -163,6 +181,54 @@ describe "stub_twirp_request" do
         expect(rpc.error).to be_a(Twirp::Error)
         expect(rpc.error.code).to be :not_found
       end
+
+      it "type checks the response" do
+        stub_twirp_request(client).to_return { request }
+
+        expect {
+          rpc
+        }.to raise_error(TypeError, /Expected type EchoResponse/)
+      end
+    end
+
+    context "when used erroneously" do
+      def check_for(*matchers)
+        expect { rpc }.to raise_error(*matchers)
+      end
+
+      it "catches response type mismatches" do
+        stub_twirp_request(client).to_return(request)
+        check_for(TypeError, /Expected type EchoResponse/)
+      end
+
+      it "catches bogus error codes" do
+        stub_twirp_request(client).to_return(:boom)
+        check_for(ArgumentError, /invalid error code/)
+      end
+
+      it "catches bogus http status codes" do
+        stub_twirp_request(client).to_return(200)
+        check_for(ArgumentError, /invalid error code/)
+      end
+
+      it "catches bogus responses" do
+        stub_twirp_request(client).to_return(Object)
+        check_for(NotImplementedError)
+      end
+
+      it "does not permit a response and block" do
+        expect {
+          stub_twirp_request(client).to_return(response) { 500 }
+        }.to raise_error(ArgumentError, /specify responses or block/)
+      end
+    end
+  end
+
+  describe ".to_return_json" do
+    it "is unsupported" do
+      expect {
+        stub_twirp_request(client).to_return_json(response.to_h)
+      }.to raise_error(NotImplementedError)
     end
   end
 end
