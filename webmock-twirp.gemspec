@@ -9,11 +9,17 @@ Gem::Specification.new do |s|
   s.version     = package.const_get "VERSION"
   s.authors     = ["Daniel Pepper"]
   s.summary     = package.to_s
-  s.description = "..."
-  s.homepage    = "https://github.com/dpep/#{package_name}_rb"
+  s.description = "Twirp support for WebMock"
+  s.homepage    = "https://github.com/dpep/#{package_name}"
   s.license     = "MIT"
 
-  s.files       = Dir.glob("lib/**/*")
+  s.files       = Dir[
+    __FILE__,
+    'lib/**/*',
+    'CHANGELOG*',
+    'LICENSE*',
+    'README*',
+  ]
 
   s.add_dependency "webmock", ">= 3"
   s.add_dependency "twirp", ">= 1"
