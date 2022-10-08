@@ -1,20 +1,27 @@
 module WebMock
   module Twirp
     class RequestStub < WebMock::RequestStub
-      def initialize(client_or_service, rpc_name)
+      def initialize(client_or_service, rpc_name = nil)
         klass = client_or_service.is_a?(Class) ? client_or_service : client_or_service.class
 
-        unless klass < ::Twirp::Client || klass < ::Twirp::Server
+        unless klass < ::Twirp::Client || klass < ::Twirp::Service
           raise TypeError, "expected Twirp Client or Service, found: #{client_or_service}"
         end
 
-        @rpc_info = klass.rpcs.values.find do |x|
-          x[:rpc_method] == rpc_name || x[:ruby_method] == rpc_name
+        @rpcs = klass.rpcs
+        uri = "/#{klass.service_full_name}"
+
+        if rpc_name
+          rpc_info = rpcs.values.find do |x|
+            x[:rpc_method] == rpc_name.to_sym || x[:ruby_method] == rpc_name.to_sym
+          end
+
+          raise ArgumentError, "invalid rpc method: #{rpc_name}" unless rpc_info
+
+          uri += "/#{rpc_info[:rpc_method]}"
+        else
+          uri += "/[^/]+"
         end
-
-        raise ArgumentError, "invalid rpc method: #{rpc_name}" unless @rpc_info
-
-        uri = "/#{klass.service_full_name}/#{@rpc_info[:rpc_method]}"
 
         super(:post, /#{uri}$/)
       end
@@ -24,19 +31,19 @@ module WebMock
           raise ArgumentError, "specify request or attrs, but not both"
         end
 
-        input_class = @rpc_info[:input_class]
-
         request_matcher = if request
-          unless request.is_a?(input_class)
-            raise TypeError, "Expected request to be type #{input_class}, found: #{request}"
+          unless request.is_a?(Google::Protobuf::MessageExts)
+            raise TypeError, "Expected request to be Protobuf::MessageExts, found: #{request}"
           end
 
           { body: request.to_proto }
         end
 
-        decoder = ->(http_request) do
+        decoder = ->(request) do
+          input_class = rpc_from_request(request)[:input_class]
+
           matched = true
-          decoded_request = input_class.decode(http_request.body)
+          decoded_request = input_class.decode(request.body)
 
           if attrs.any?
             attr_matcher = Matchers::HashIncludingMatcher.new(**attrs)
@@ -64,13 +71,18 @@ module WebMock
         responses << nil if responses.empty? && block.nil?
 
         response_hashes = responses.map do |response|
-          resp = generate_http_response(response)
+          ->(request) do
+            # determine msg type and package response
+            output_class = rpc_from_request(request)[:output_class]
+            generate_http_response(output_class, response)
+          end
         end
 
-        input_class = @rpc_info[:input_class]
         decoder = ->(request) do
-          res = block.call(input_class.decode(request.body))
-          generate_http_response(res)
+          # determine msg type and call provided block
+          rpc = rpc_from_request(request)
+          res = block.call(rpc[:input_class].decode(request.body))
+          generate_http_response(rpc[:output_class], res)
         end if block_given?
 
         super(*response_hashes, &decoder)
@@ -82,13 +94,25 @@ module WebMock
 
       private
 
-      def generate_http_response(obj)
+      attr_reader :rpcs
+
+      def rpc_from_request(request_signature)
+        rpcs[request_signature.uri.path.split("/").last]
+      end
+
+      def generate_http_response(msg_class, obj)
         res = case obj
         when nil
-          @rpc_info[:output_class].new
+          msg_class.new
         when Hash
-          @rpc_info[:output_class].new(**obj)
-        when Google::Protobuf::MessageExts, ::Twirp::Error
+          msg_class.new(**obj)
+        when Google::Protobuf::MessageExts
+          unless obj.is_a?(msg_class)
+            raise TypeError, "Expected type #{msg_class}, found #{obj}"
+          end
+
+          obj
+        when ::Twirp::Error
           obj
         when Symbol
           if ::Twirp::Error.valid_code?(obj)

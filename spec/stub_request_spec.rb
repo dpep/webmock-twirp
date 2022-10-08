@@ -16,34 +16,63 @@ describe "stub_twirp_request" do
   end
 
   it "stubs twirp requests" do
-    @stub = stub_twirp_request(client, :echo)
+    @stub = stub_twirp_request(client)
+  end
+
+  it "works with a twirp client class" do
+    @stub = stub_twirp_request(client.class)
+  end
+
+  it "works with a twirp service" do
+    @stub = stub_twirp_request(EchoService)
+  end
+
+  context "when a specific rpc method is specified" do
+    it "stubs a specific twirp request" do
+      @stub = stub_twirp_request(client, :echo)
+    end
+
+    it "works with the rpc method name" do
+      @stub = stub_twirp_request(client, :Echo)
+    end
+
+    it "works with the rpc method name in string form" do
+      @stub = stub_twirp_request(client, "Echo")
+    end
+
+    it "does not stub different rpc method" do
+      stub = stub_twirp_request(client, :double)
+
+      expect { rpc }.to raise_error(WebMock::NetConnectNotAllowedError)
+      expect(stub).not_to have_been_requested
+    end
   end
 
   describe ".with" do
     it "matches attributes" do
-      @stub = stub_twirp_request(client, :echo).with(msg: "woof")
+      @stub = stub_twirp_request(client).with(msg: "woof")
     end
 
     it "matches an attribute regex" do
-      @stub = stub_twirp_request(client, :echo).with(msg: /^wo+/)
+      @stub = stub_twirp_request(client).with(msg: /^wo+/)
     end
 
     it "matches proto messages" do
-      @stub = stub_twirp_request(client, :echo).with(request)
+      @stub = stub_twirp_request(client).with(request)
     end
 
     it "supports block mode" do
-      @stub = stub_twirp_request(client, :echo).with do |request|
+      @stub = stub_twirp_request(client).with do |request|
         expect(request).to be_a(EchoRequest)
         expect(request.msg).to eq "woof"
       end
     end
 
-    it "does not catch mismatches" do
-      stub_twirp_request(client, :echo).with(msg: "rav")
-      stub_twirp_request(client, :echo).with(msg: /rav/)
-      stub_twirp_request(client, :echo).with(EchoRequest.new)
-      stub_twirp_request(client, :echo).with { false }
+    it "does not stub mismatches" do
+      stub_twirp_request(client).with(msg: "rav")
+      stub_twirp_request(client).with(msg: /rav/)
+      stub_twirp_request(client).with(EchoRequest.new)
+      stub_twirp_request(client).with { false }
 
       expect { rpc }.to raise_error(WebMock::NetConnectNotAllowedError)
     end
@@ -51,38 +80,38 @@ describe "stub_twirp_request" do
 
   describe ".to_return" do
     it "defaults to the default response" do
-      @stub = stub_twirp_request(client, :echo).to_return
+      @stub = stub_twirp_request(client).to_return
 
       expect(rpc).to be_a(Twirp::ClientResp)
       expect(rpc.data).to be_a(EchoResponse)
     end
 
     it "supports attributes" do
-      @stub = stub_twirp_request(client, :echo).to_return(msg: "rav")
+      @stub = stub_twirp_request(client).to_return(msg: "rav")
       expect(rpc.data.msg).to eq "rav"
     end
 
     it "supports proto messages" do
-      @stub = stub_twirp_request(client, :echo).to_return(response)
+      @stub = stub_twirp_request(client).to_return(response)
       expect(rpc.data.msg).to eq response.msg
     end
 
     it "supports Twirp errors" do
-      @stub = stub_twirp_request(client, :echo).to_return(error)
+      @stub = stub_twirp_request(client).to_return(error)
       expect(rpc.error).to be_a(Twirp::Error)
       expect(rpc.error.code).to be error.code
       expect(rpc.error.msg).to eq error.msg
     end
 
     it "supports Twirp error codes" do
-      @stub = stub_twirp_request(client, :echo).to_return(:not_found)
+      @stub = stub_twirp_request(client).to_return(:not_found)
       expect(rpc.error).to be_a(Twirp::Error)
       expect(rpc.error.code).to be :not_found
       expect(rpc.error.msg).to eq "not_found"
     end
 
     it "supports http error codes" do
-      @stub = stub_twirp_request(client, :echo).to_return(404)
+      @stub = stub_twirp_request(client).to_return(404)
       expect(rpc.error).to be_a(Twirp::Error)
       expect(rpc.error.code).to be :not_found
       expect(rpc.error.msg).to eq "not_found"
@@ -90,21 +119,21 @@ describe "stub_twirp_request" do
 
     context "with block mode" do
       it "passes in the Twirp request" do
-        @stub = stub_twirp_request(client, :echo).to_return do |request|
+        @stub = stub_twirp_request(client).to_return do |request|
           expect(request).to be_a(EchoRequest)
           nil
         end
       end
 
       it "defaults to the default response" do
-        @stub = stub_twirp_request(client, :echo).to_return {}
+        @stub = stub_twirp_request(client).to_return {}
 
         expect(rpc).to be_a(Twirp::ClientResp)
         expect(rpc.data).to be_a(EchoResponse)
       end
 
       it "supports attribute hashes" do
-        @stub = stub_twirp_request(client, :echo).to_return do
+        @stub = stub_twirp_request(client).to_return do
           { msg: "boo" }
         end
 
@@ -112,25 +141,25 @@ describe "stub_twirp_request" do
       end
 
       it "supports proto messages" do
-        @stub = stub_twirp_request(client, :echo).to_return { response }
+        @stub = stub_twirp_request(client).to_return { response }
         expect(rpc.data.msg).to eq response.msg
       end
 
       it "supports Twirp errors" do
-        @stub = stub_twirp_request(client, :echo).to_return { error }
+        @stub = stub_twirp_request(client).to_return { error }
         expect(rpc.error).to be_a(Twirp::Error)
         expect(rpc.error.code).to be error.code
         expect(rpc.error.msg).to eq error.msg
       end
 
       it "supports Twirp error codes" do
-        @stub = stub_twirp_request(client, :echo).to_return(:not_found)
+        @stub = stub_twirp_request(client).to_return(:not_found)
         expect(rpc.error).to be_a(Twirp::Error)
         expect(rpc.error.code).to be :not_found
       end
 
       it "supports http error codes" do
-        @stub = stub_twirp_request(client, :echo).to_return { 404 }
+        @stub = stub_twirp_request(client).to_return { 404 }
         expect(rpc.error).to be_a(Twirp::Error)
         expect(rpc.error.code).to be :not_found
       end
