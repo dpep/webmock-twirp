@@ -1,10 +1,29 @@
-webmock-twirp
+WebMock::Twirp
 ======
-...
+Twirp support for [WebMock](https://github.com/bblimke/webmock).  All our favorite http request stubbing for Twirp RPCs - message and error serialization done automatically.
 
 
 ```ruby
 require "webmock-twirp"
+
+stub_twirp_request(MyTwirpClient, :optional_rpc_method)
+
+stub_twirp_request(...).with(my_request_message: /^foo/)
+
+# or use block mode
+stub_twirp_request(...).with do |request|
+  request # the Twirp request, aka. proto message, used to initiate the request
+  request.my_request_message == "hello"
+end
+
+
+stub_twirp_request(...).and_return(return_message: "yo yo")
+stub_twirp_request(...).and_return(404) # results in a Twirp::Error.not_found
+
+# or use block mode
+stub_twirp_request(...).and_return do |request|
+  { response_message: "oh hi" } # will get properly packaged up automagically
+end
 ```
 
 
