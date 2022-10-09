@@ -117,6 +117,7 @@ module WebMock
 
         super(*response_hashes, &decoder)
       end
+      alias_method :and_return, :to_return # update existing alias
 
       def to_return_json(*)
         raise NotImplementedError

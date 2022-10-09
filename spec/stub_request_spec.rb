@@ -182,6 +182,11 @@ describe "stub_twirp_request" do
       expect(rpc.error.msg).to eq "not_found"
     end
 
+    it "works with the and_return alias" do
+      @stub = stub_twirp_request.and_return(404)
+      expect(rpc.error).to be_a(Twirp::Error)
+    end
+
     context "with block mode" do
       it "passes in the Twirp request" do
         @stub = stub_twirp_request.to_return do |request|
