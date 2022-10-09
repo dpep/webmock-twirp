@@ -4,25 +4,35 @@ Twirp support for [WebMock](https://github.com/bblimke/webmock).  All our favori
 
 
 ```ruby
-require "webmock-twirp"
+require "webmock/twirp"
 
-stub_twirp_request(MyTwirpClient, :optional_rpc_method)
+it "stubs twirp calls" do 
+  stub_twirp_request
+  
+  client.my_rpc_method(request)
+end
 
-stub_twirp_request(...).with(my_request_message: /^foo/)
+it "matches calls from specific twirp clients and rpc methods" do
+  stub_twirp_request(MyTwirpClient, :optional_rpc_method)
+end
+
+# match parameters
+stub_twirp_request.with(my_request_message: /^foo/)
 
 # or use block mode
-stub_twirp_request(...).with do |request|
+stub_twirp_request.with do |request|
   request # the Twirp request, aka. proto message, used to initiate the request
   request.my_request_message == "hello"
 end
 
 
-stub_twirp_request(...).and_return(return_message: "yo yo")
-stub_twirp_request(...).and_return(404) # results in a Twirp::Error.not_found
+# stub responses
+stub_twirp_request.and_return(return_message: "yo yo")
+stub_twirp_request.and_return(404) # results in a Twirp::Error.not_found
 
 # or use block mode
-stub_twirp_request(...).and_return do |request|
-  { response_message: "oh hi" } # will get properly packaged up automagically
+stub_twirp_request.and_return do |request|
+  { response_message: "oh hi" } # will get properly packaged up
 end
 ```
 
