@@ -25,6 +25,7 @@ module WebMock
         end
 
         if klass
+          @rpcs = klass.rpcs
           uri += "/#{klass.service_full_name}"
         else
           uri += "/[^/]+"
@@ -126,17 +127,21 @@ module WebMock
       def rpc_from_request(request_signature)
         service_full_name, rpc_name = request_signature.uri.path.split("/").last(2)
 
-        # stub pre-existing client instances
-        client = ObjectSpace.each_object(::Twirp::Client).find do |client|
-          service_full_name == client.class.service_full_name && \
-            client.class.rpcs.key?(rpc_name)
+        rpcs = @rpcs || begin
+          # find matching client instance
+          client = ObjectSpace.each_object(::Twirp::Client).find do |client|
+            service_full_name == client.class.service_full_name && \
+              client.class.rpcs.key?(rpc_name)
+          end
+
+          unless client
+            raise "could not determine Twirp::Client for call to: #{service_full_name}/#{rpc_name}"
+          end
+
+          client.class.rpcs
         end
 
-        unless client
-          raise "could not determine Twirp::Client for call to: #{service_full_name}/#{rpc_name}"
-        end
-
-        client.class.rpcs[rpc_name]
+        rpcs[rpc_name]
       end
 
       def generate_http_response(msg_class, obj)
