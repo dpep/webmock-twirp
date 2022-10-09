@@ -3,12 +3,10 @@ pool = Google::Protobuf::DescriptorPool.new
 pool.build do
   add_message "EchoRequest" do
     optional :msg, :string, 1
-    optional :count, :int32, 2
   end
 
   add_message "EchoResponse" do
     optional :msg, :string, 1
-    optional :count, :int32, 2
   end
 end
 
@@ -27,10 +25,10 @@ end
 
 class EchoHandler
   def echo(req, env)
-    { msg: req.msg, count: req.count }.compact
+    { msg: req.msg }
   end
 
-  def double(req, env)
-    { msg: req.msg, count: req.count * 2 }.compact
+  def double(...)
+    echo(...)
   end
 end
