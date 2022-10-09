@@ -1,29 +1,58 @@
 module WebMock
   module Twirp
     class RequestStub < WebMock::RequestStub
-      def initialize(client_or_service, rpc_name = nil)
-        klass = client_or_service.is_a?(Class) ? client_or_service : client_or_service.class
+      using Refinements
 
-        unless klass < ::Twirp::Client || klass < ::Twirp::Service
-          raise TypeError, "expected Twirp Client or Service, found: #{client_or_service}"
+      def initialize(*filters)
+        rpc_name = filters.snag { |x| x.is_a?(Symbol) }
+
+        client = filters.snag { |x| x.is_a?(::Twirp::Client) }
+
+        klass = client&.class
+        klass ||= filters.snag do |x|
+          x.is_a?(Class) && (x < ::Twirp::Client || x < ::Twirp::Service)
         end
 
-        @rpcs = klass.rpcs
-        uri = "/#{klass.service_full_name}"
+        unless filters.empty?
+          raise ArgumentError, "unexpected arguments: #{filters}"
+        end
+
+        uri = ""
+
+        if client
+          conn = client.instance_variable_get(:@conn)
+          uri += conn.url_prefix.to_s if conn
+        end
+
+        if klass
+          uri += "/#{klass.service_full_name}"
+        else
+          uri += "/[^/]+"
+        end
 
         if rpc_name
-          rpc_info = rpcs.values.find do |x|
-            x[:rpc_method] == rpc_name.to_sym || x[:ruby_method] == rpc_name.to_sym
+          if klass
+            # kindly convert ruby method to rpc method name
+            rpc_info = klass.rpcs.values.find do |x|
+              x[:rpc_method] == rpc_name || x[:ruby_method] == rpc_name
+            end
+
+            raise ArgumentError, "invalid rpc method: #{rpc_name}" unless rpc_info
+
+            uri += "/#{rpc_info[:rpc_method]}"
+          else
+            uri += "/#{rpc_name}"
           end
-
-          raise ArgumentError, "invalid rpc method: #{rpc_name}" unless rpc_info
-
-          uri += "/#{rpc_info[:rpc_method]}"
         else
           uri += "/[^/]+"
         end
 
         super(:post, /#{uri}$/)
+
+        # filter on Twirp header
+        @request_pattern.with(
+          headers: { "Content-Type" => ::Twirp::Encoding::PROTO },
+        )
       end
 
       def with(request = nil, **attrs, &block)
@@ -94,10 +123,20 @@ module WebMock
 
       private
 
-      attr_reader :rpcs
-
       def rpc_from_request(request_signature)
-        rpcs[request_signature.uri.path.split("/").last]
+        service_full_name, rpc_name = request_signature.uri.path.split("/").last(2)
+
+        # stub pre-existing client instances
+        client = ObjectSpace.each_object(::Twirp::Client).find do |client|
+          service_full_name == client.class.service_full_name && \
+            client.class.rpcs.key?(rpc_name)
+        end
+
+        unless client
+          raise "could not determine Twirp::Client for call to: #{service_full_name}/#{rpc_name}"
+        end
+
+        client.class.rpcs[rpc_name]
       end
 
       def generate_http_response(msg_class, obj)

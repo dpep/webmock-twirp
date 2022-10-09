@@ -1,6 +1,7 @@
 require "google/protobuf"
 require "twirp"
 require "webmock"
+require "webmock/twirp/refinements"
 require "webmock/twirp/request_stub"
 require "webmock/twirp/version"
 
