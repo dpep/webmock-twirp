@@ -2,7 +2,12 @@ WebMock::Twirp
 ======
 Twirp support for [WebMock](https://github.com/bblimke/webmock).  All our favorite http request stubbing for Twirp RPCs - message and error serialization done automatically.
 
+###  Install
+```ruby
+gem "webmock-twirp"
+```
 
+###  Usage
 ```ruby
 require "webmock/twirp"
 
