@@ -260,12 +260,12 @@ describe "stub_twirp_request" do
 
       it "catches bogus http status codes" do
         stub_twirp_request.to_return(200)
-        check_for(ArgumentError, /invalid error code/)
+        check_for(ArgumentError, /invalid http error status/)
       end
 
       it "catches bogus responses" do
         stub_twirp_request.to_return(Object)
-        check_for(NotImplementedError)
+        check_for(ArgumentError, /Object/)
       end
 
       it "does not permit a response and block" do

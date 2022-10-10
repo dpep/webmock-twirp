@@ -169,10 +169,10 @@ module WebMock
           if code = ::Twirp::ERROR_CODES_TO_HTTP_STATUS.key(obj)
             ::Twirp::Error.new(code, code)
           else
-            raise ArgumentError, "invalid error code: #{obj}"
+            raise ArgumentError, "invalid http error status: #{obj}"
           end
         else
-          raise NotImplementedError
+          raise ArgumentError, "can not generate twirp reponse from: #{obj}"
         end
 
         if res.is_a?(Google::Protobuf::MessageExts)
