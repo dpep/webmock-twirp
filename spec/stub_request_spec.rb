@@ -114,13 +114,6 @@ describe "stub_twirp_request" do
       @stub = stub_twirp_request.with(request)
     end
 
-    it "supports block mode" do
-      @stub = stub_twirp_request.with do |request|
-        expect(request).to be_a(EchoRequest)
-        expect(request.msg).to eq "woof"
-      end
-    end
-
     it "does not stub mismatches" do
       stub_twirp_request.with(msg: "rav")
       stub_twirp_request.with(msg: /rav/)
@@ -140,6 +133,28 @@ describe "stub_twirp_request" do
       expect {
         stub_twirp_request.with(Object)
       }.to raise_error(TypeError, /to be Protobuf::MessageExts/)
+    end
+
+    context "with block mode" do
+      it "passes in a twirp message instance" do
+        @stub = stub_twirp_request.with do |request|
+          expect(request).to be_a(EchoRequest)
+        end
+      end
+
+      it "can be used to match request attributes" do
+        @stub = stub_twirp_request.with do |request|
+          request.msg == "woof"
+        end
+      end
+
+      it "does not stub if the block returns false" do
+        stub_twirp_request.with do |request|
+          request.msg == "xyz"
+        end
+
+        expect_stub_failure
+      end
     end
   end
 
