@@ -156,6 +156,18 @@ describe "stub_twirp_request" do
         expect_stub_failure
       end
     end
+
+    context "with rspec matchers" do
+      it { @stub = stub_twirp_request.with(msg: eq("woof")) }
+      it { @stub = stub_twirp_request.with(msg: start_with("w")) }
+      it { @stub = stub_twirp_request.with(msg: include("oo")) }
+
+      it "works within blocks" do
+        @stub = stub_twirp_request.with do |request|
+          respond_to(:msg) & having_attributes(msg: "woof") === request
+        end
+      end
+    end
   end
 
   describe ".to_return" do
