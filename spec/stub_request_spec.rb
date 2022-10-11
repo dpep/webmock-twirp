@@ -168,6 +168,18 @@ describe "stub_twirp_request" do
         end
       end
     end
+
+    it "fails unless the corresponding Twirp::Client is found" do
+      stub_twirp_request.with(msg: "woof")
+
+      expect {
+        Faraday.post(
+          "http://localhost/twirp/Foo/foo",
+          request.to_proto,
+          { "Content-Type" => ::Twirp::Encoding::PROTO },
+        )
+      }.to raise_error(RuntimeError, /could not determine Twirp::Client/)
+    end
   end
 
   describe ".to_return" do

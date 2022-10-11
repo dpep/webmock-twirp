@@ -31,8 +31,7 @@ if $LOADED_FEATURES.find { |x| x =~ %r{/webmock/rspec.rb} }
   # require "webmock/rspec"
   RSpec.configure { |c| c.include WebMock::Twirp::API }
 else
-  # patch Webmock to also export stub_twirp_request
-
+  # patch WebMock to also export stub_twirp_request
   module WebMock
     module API
       include WebMock::Twirp::API
