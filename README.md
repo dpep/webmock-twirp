@@ -7,7 +7,7 @@ Twirp support for [WebMock](https://github.com/bblimke/webmock).  All our favori
 gem "webmock-twirp"
 ```
 
-###  Usage
+###  Example
 ```ruby
 require "webmock/twirp"
 
@@ -38,6 +38,57 @@ stub_twirp_request.and_return(404) # results in a Twirp::Error.not_found
 # or use block mode
 stub_twirp_request.and_return do |request|
   { response_message: "oh hi" } # will get properly packaged up
+end
+```
+
+
+## Usage
+
+### .with
+`stub_twirp_request.with` allows you to only stub requests which match specific attributes.  It accepts a hash or a `Google::Protobuf::MessageExts` instance.  The hash supports constants, regexes, and rspec matchers.
+
+```ruby
+stub_twirp_request.with(message: "hi")
+stub_twirp_request.with(message: /^h/)
+stub_twirp_request.with(message: include("i"))
+
+expected_request = MyTwirpRequest.new(message: "hi")
+stub_twirp_request.with(expected_request)
+```
+
+
+If you want even more control over the matching criteria, use the block mode.  A `Protobuf` instance is passed into the block with the request's parameters.
+
+```ruby
+stub_twirp_request.with do |request|
+  request.message == "hi"
+end
+```
+
+
+### .to_return
+`stub_twirp_request.to_return` allows you to specify a response.  It can be a hash or `Protobuf` instance.  To return an error, specify an error code, http status, or `Twirp::Error`.
+
+```ruby
+stub_twirp_request.to_return(msg: "bye")
+
+response = MyTwirpResponse.new(msg: "bye")
+stub_twirp_request.to_return(response)
+
+# errors
+stub_twirp_request.to_return(:not_found)
+stub_twirp_request.to_return(404)
+stub_twirp_request.to_return(Twirp::Error.not_found("Nope"))
+```
+
+The block mode passes in the request Protobuf.
+```ruby
+stub_twirp_request.to_return do |request|
+  if request.message == "hi"
+    { msg: "bye" }
+  else
+    :not_found
+  end
 end
 ```
 
