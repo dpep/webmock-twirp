@@ -67,9 +67,11 @@ end
 
 
 ### .to_return
-`stub_twirp_request.to_return` allows you to specify a response.  It can be a hash or `Protobuf` instance.  To return an error, specify an error code, http status, or `Twirp::Error`.
+`stub_twirp_request.to_return` allows you to specify a response, or use a default response.  It can be a hash or `Protobuf` instance.  To return an error, specify an error code, http status, or `Twirp::Error`.
 
 ```ruby
+stub_twirp_request.to_return # ie. `MyTwirpResponse.new`
+
 stub_twirp_request.to_return(msg: "bye")
 
 response = MyTwirpResponse.new(msg: "bye")
