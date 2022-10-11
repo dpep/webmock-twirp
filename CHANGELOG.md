@@ -1,3 +1,9 @@
+###  v0.1.1  (2022-10-11)
+- test coverage
+- error messages
+- fix and_return alias
+- Update README.md
+
 ###  v0.1.0  (2022-10-09)
 - dynamic client/rpc lookup
 
