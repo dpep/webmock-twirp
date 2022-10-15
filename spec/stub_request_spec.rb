@@ -313,6 +313,14 @@ describe "stub_twirp_request" do
         }.to raise_error(ArgumentError, /specify responses or block/)
       end
     end
+
+    it "works after a with block" do
+      @stub = stub_twirp_request.with do |request|
+        request.msg == "woof"
+      end.and_return(msg: "woof woof")
+
+      expect(rpc.data.msg).to eq "woof woof"
+    end
   end
 
   describe ".to_return_json" do
