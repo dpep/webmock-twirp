@@ -76,10 +76,17 @@ module WebMock
           decoded_request = input_class.decode(request.body)
 
           if attrs.any?
-            attr_matcher = Matchers::HashIncludingMatcher.new(**attrs)
-            attr_hash = WebMock::Util::HashKeysStringifier.stringify_keys!(decoded_request.to_h, deep: true)
+            if defined?(RSpec::Matchers::BuiltIn::Include)
+              matcher = RSpec::Matchers::BuiltIn::Include.new(attrs)
+              attr_hash = decoded_request.to_h
+              normalize = ->{ decoded_request.normalized_hash }
+            else
+              matcher = WebMock::Matchers::HashIncludingMatcher.new(attrs)
+              attr_hash = WebMock::Util::HashKeysStringifier.stringify_keys!(decoded_request.to_h, deep: true)
+              normalize = ->{ decoded_request.normalized_hash(symbolize_keys: false) }
+            end
 
-            matched &= attr_matcher === attr_hash
+            matched &= (matcher === attr_hash || matcher === normalize.call)
           end
 
           if block
