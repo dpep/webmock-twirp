@@ -1,3 +1,7 @@
+###  v0.1.2  (2022-10-17)
+- improved matching
+- test coverage
+
 ###  v0.1.1  (2022-10-11)
 - test coverage
 - error messages
