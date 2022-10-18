@@ -7,9 +7,10 @@ describe "stub_twirp_request" do
     ComplexMessage.new(
       msg: EchoRequest.new(msg: "woof"),
       uid: 123,
-      date: { month: 10, day: 16 },
+      date: date,
     )
   end
+  let(:date) { { month: 10, day: 16 } }
 
   def rpc
     @rpc ||= client.echo(message)
@@ -20,7 +21,6 @@ describe "stub_twirp_request" do
       expect { rpc }.to raise_error(WebMock::NetConnectNotAllowedError)
     else
       rpc
-      expect(@stub).to have_been_requested if @stub
     end
   end
 
@@ -30,33 +30,26 @@ describe "stub_twirp_request" do
 
   it { stub_twirp_request.with(message) }
 
-  context "with RSpec::Matchers" do
-    it { stub_twirp_request.with(date: { month: 10, day: 16 }) }
-    it { stub_twirp_request.with(date: { month: 10, day: 16, year: 0 }) }
-    it { stub_twirp_request.with(date: { month: 10, day: anything }) }
-    it { stub_twirp_request.with(date: { month: 10, day: 16, year: anything }) }
+  it { stub_twirp_request.with(msg: anything) }
+  it { stub_twirp_request.with(msg: { msg: "woof" }) }
+  it { stub_twirp_request.with(msg: { msg: /^w/ }) }
 
-    stub_fail do
-      stub_twirp_request.with(date: { month: 10 })
-    end
+  it { stub_twirp_request.with(uid: 123) }
+  it { stub_twirp_request.with(uid: Integer) }
+
+  it { stub_twirp_request.with(date: date) }
+  it { stub_twirp_request.with(date: { month: 10, day: 16 }) }
+  it { stub_twirp_request.with(date: include(month: 10)) }
+  it { stub_twirp_request.with(date: include(month: 10, day: 16, year: 0)) }
+  it { stub_twirp_request.with(date: { month: 10, day: 16, year: 0, type: :DATE_DEFAULT }) }
+  it { stub_twirp_request.with(date: { month: 10, day: anything }) }
+  it { stub_twirp_request.with(date: { month: 10, day: 16, year: Integer, type: anything }) }
+
+  stub_fail do
+    stub_twirp_request.with(date: { month: 10 })
   end
 
-  context "without RSpec::Matchers" do
-    before { hide_const("RSpec::Matchers::BuiltIn::Include") }
-
-    it { stub_twirp_request.with(date: { month: 10, day: 16 }) }
-    it { stub_twirp_request.with(date: { month: 10, day: 16, year: 0 }) }
-
-    stub_fail do
-      stub_twirp_request.with(date: { month: 10, day: anything })
-    end
-
-    stub_fail do
-      stub_twirp_request.with(date: { month: 10, day: 16, year: anything })
-    end
-
-    stub_fail do
-      stub_twirp_request.with(date: { month: 10 })
-    end
+  stub_fail do
+    stub_twirp_request.with(type: :ECHO_DOUBLE)
   end
 end

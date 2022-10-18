@@ -71,27 +71,11 @@ module WebMock
 
         decoder = ->(request) do
           input_class = rpc_from_request(request)[:input_class]
-
-          matched = true
           decoded_request = input_class.decode(request.body)
 
-          if attrs.any?
-            if defined?(RSpec::Matchers::BuiltIn::Include)
-              matcher = RSpec::Matchers::BuiltIn::Include.new(attrs)
-              attr_hash = decoded_request.to_h
-              normalize = ->{ decoded_request.normalized_hash }
-            else
-              matcher = WebMock::Matchers::HashIncludingMatcher.new(attrs)
-              attr_hash = WebMock::Util::HashKeysStringifier.stringify_keys!(decoded_request.to_h, deep: true)
-              normalize = ->{ decoded_request.normalized_hash(symbolize_keys: false) }
-            end
-
-            matched &= (matcher === attr_hash || matcher === normalize.call)
-          end
-
-          if block
-            matched &= block.call(decoded_request)
-          end
+          matched = true
+          matched &= decoded_request.include?(attrs) if attrs.any?
+          matched &= block.call(decoded_request) if block
 
           matched
         end if attrs.any? || block_given?
