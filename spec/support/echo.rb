@@ -9,20 +9,20 @@ pool.build do
     optional :msg, :string, 1
   end
 
-  add_message "DateMessage" do
-    optional :month, :int32, 1
-    optional :day, :int32, 2
-    optional :year, :int32, 3
+  add_enum "DateType" do
+    value :DATE_DEFAULT, 0
+    value :DATE_BDAY, 1
   end
 
-  add_enum "EchoType" do
-    value :ECHO_DEFAULT, 0
-    value :ECHO_DOUBLE, 1
+  add_message "DateMessage" do
+    optional :type, :enum, 1, "DateType"
+    optional :month, :int32, 2
+    optional :day, :int32, 3
+    optional :year, :int32, 4
   end
 
   add_message "ComplexMessage" do
     optional :msg, :message, 1, "EchoRequest"
-    optional :type, :enum, 2, "EchoType"
     optional :complex, :bool, 3
     optional :date, :message, 4, "DateMessage"
 
@@ -57,8 +57,8 @@ class EchoHandler
 end
 
 
+DateType = pool.lookup("DateType").enummodule
 DateMessage = pool.lookup("DateMessage").msgclass
-EchoType = pool.lookup("EchoType").enummodule
 ComplexMessage = pool.lookup("ComplexMessage").msgclass
 
 class ComplexService < Twirp::Service
