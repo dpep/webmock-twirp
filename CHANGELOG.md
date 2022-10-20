@@ -1,3 +1,6 @@
+###  v0.2.1  (2022-10-19)
+- fix client matching
+
 ###  v0.2.0  (2022-10-17)
 - improved matching
 
