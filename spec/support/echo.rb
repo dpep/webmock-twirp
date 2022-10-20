@@ -62,7 +62,9 @@ DateMessage = pool.lookup("DateMessage").msgclass
 ComplexMessage = pool.lookup("ComplexMessage").msgclass
 
 class ComplexService < Twirp::Service
+  package "example"
   service "Complex"
+
   rpc :Echo, ComplexMessage, ComplexMessage, :ruby_method => :echo
 end
 
