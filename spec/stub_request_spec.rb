@@ -67,6 +67,14 @@ describe "stub_twirp_request" do
       }.to raise_error(ArgumentError, /unexpected arguments/)
     end
 
+    context "when client url has trailing /" do
+      let(:client) { EchoClient.new("http://localhost/twirp/") }
+
+      it "normalizes and stubs properly" do
+        @stub = stub_twirp_request(client)
+      end
+    end
+
     context "when a specific rpc method is specified" do
       it "stubs a specific twirp request" do
         stub = stub_twirp_request(:Echo)

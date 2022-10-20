@@ -21,7 +21,7 @@ module WebMock
 
         if client
           conn = client.instance_variable_get(:@conn)
-          uri += conn.url_prefix.to_s if conn
+          uri += conn.url_prefix.to_s.chomp("/") if conn
         end
 
         if klass
