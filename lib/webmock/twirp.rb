@@ -1,6 +1,7 @@
 require "google/protobuf"
 require "twirp"
 require "webmock"
+require "webmock/twirp/matchers"
 require "webmock/twirp/refinements"
 require "webmock/twirp/request_stub"
 require "webmock/twirp/version"
@@ -26,15 +27,22 @@ module WebMock
   end
 end
 
+# patch WebMock to export Twirp helpers
+module WebMock
+  module API
+    include WebMock::Twirp::API
+  end
 
-if $LOADED_FEATURES.find { |x| x =~ %r{/webmock/rspec.rb} }
-  # require "webmock/rspec"
-  RSpec.configure { |c| c.include WebMock::Twirp::API }
-else
-  # patch WebMock to also export stub_twirp_request
-  module WebMock
-    module API
-      include WebMock::Twirp::API
-    end
+  module Matchers
+    include WebMock::Twirp::Matchers
+  end
+end
+
+if $LOADED_FEATURES.find { |x| x =~ %r{/webmock/rspec.rb$} }
+  # require "webmock/rspec" was already called, so load helpers
+
+  RSpec.configure do |conf|
+    conf.include WebMock::Twirp::API
+    conf.include WebMock::Twirp::Matchers
   end
 end

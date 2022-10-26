@@ -25,6 +25,9 @@ RSpec.configure do |config|
     # verify existence of stubbed methods
     mocks.verify_partial_doubles = true
   end
+
+  # expect { ... }.to fail
+  config.include RSpec::Matchers::FailMatchers
 end
 
 Dir["./spec/support/**/*.rb"].sort.each { |f| require f }
