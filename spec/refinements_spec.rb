@@ -167,4 +167,36 @@ describe WebMock::Twirp::Refinements do
       is_expected.not_to match_attrs(:foo)
     end
   end
+
+  describe "WebMock::RequestSignature" do
+    let(:client) { EchoClient.new("http://localhost/twirp") }
+    let(:twirp_request) { EchoRequest.new(msg: "woof") }
+    let(:request) do
+      stub_twirp_request
+      client.echo(twirp_request)
+
+      WebMock::RequestRegistry.instance.requested_signatures.select { true }.first.first
+    end
+
+    describe "#twirp_client" do
+      subject { request.twirp_client }
+
+      it { is_expected.to be < ::Twirp::Client }
+      it { is_expected.to be EchoClient }
+    end
+
+    describe "#twirp_rpc" do
+      subject { request.twirp_rpc }
+
+      it { is_expected.to be_a(Hash) }
+      it { is_expected.to eq(EchoClient.rpcs["Echo"]) }
+    end
+
+    describe "#twirp_request" do
+      subject { request.twirp_request }
+
+      it { is_expected.to be_a(EchoRequest) }
+      it { is_expected.to eq(twirp_request) }
+    end
+  end
 end

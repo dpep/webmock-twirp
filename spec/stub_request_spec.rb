@@ -177,16 +177,18 @@ describe "stub_twirp_request" do
       end
     end
 
-    it "fails unless the corresponding Twirp::Client is found" do
-      stub_twirp_request.with(msg: "woof")
+    context "when no corresponding Twirp::Client is found" do
+      it "does not match" do
+        stub_twirp_request.with(msg: "woof")
 
-      expect {
-        Faraday.post(
-          "http://localhost/twirp/Foo/foo",
-          request.to_proto,
-          { "Content-Type" => ::Twirp::Encoding::PROTO },
-        )
-      }.to raise_error(RuntimeError, /could not determine Twirp::Client/)
+        expect {
+          Faraday.post(
+            "http://localhost/twirp/Foo/foo",
+            request.to_proto,
+            { "Content-Type" => ::Twirp::Encoding::PROTO },
+          )
+        }.to raise_error(WebMock::NetConnectNotAllowedError)
+      end
     end
   end
 
@@ -328,6 +330,18 @@ describe "stub_twirp_request" do
       end.and_return(msg: "woof woof")
 
       expect(rpc.data.msg).to eq "woof woof"
+    end
+
+    it "raises when no corresponding Twirp::Client is found" do
+      stub_twirp_request.to_return(msg: "woof")
+
+      expect {
+        Faraday.post(
+          "http://localhost/twirp/Foo/foo",
+          request.to_proto,
+          { "Content-Type" => ::Twirp::Encoding::PROTO },
+        )
+      }.to raise_error(/could not determine Twirp::Client/)
     end
   end
 

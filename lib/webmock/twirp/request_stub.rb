@@ -69,13 +69,12 @@ module WebMock
           { body: request.to_proto }
         end
 
-        decoder = ->(request) do
-          input_class = rpc_from_request(request)[:input_class]
-          decoded_request = input_class.decode(request.body)
+        decoder = ->(request_signature) do
+          request = request_signature.twirp_request
 
-          matched = true
-          matched &= decoded_request.include?(attrs) if attrs.any?
-          matched &= block.call(decoded_request) if block
+          matched = !!request
+          matched &&= request.include?(attrs) if attrs.any?
+          matched &&= block.call(request) if block
 
           matched
         end if attrs.any? || block_given?
@@ -93,17 +92,15 @@ module WebMock
 
         response_hashes = responses.map do |response|
           ->(request) do
-            # determine msg type and package response
-            output_class = rpc_from_request(request)[:output_class]
-            generate_http_response(output_class, response)
+            generate_http_response(request, response)
           end
         end
 
         decoder = ->(request) do
-          # determine msg type and call provided block
-          rpc = rpc_from_request(request)
-          res = block.call(rpc[:input_class].decode(request.body))
-          generate_http_response(rpc[:output_class], res)
+          generate_http_response(
+            request,
+            block.call(request.twirp_request),
+          )
         end if block_given?
 
         super(*response_hashes, &decoder)
@@ -116,27 +113,13 @@ module WebMock
 
       private
 
-      def rpc_from_request(request_signature)
-        service_full_name, rpc_name = request_signature.uri.path.split("/").last(2)
+      def generate_http_response(request, obj)
+        msg_class = request.twirp_rpc&.fetch(:output_class)
 
-        rpcs = @rpcs || begin
-          # find matching client instance
-          client = ObjectSpace.each_object(::Twirp::Client).find do |client|
-            service_full_name == client.class.service_full_name && \
-              client.class.rpcs.key?(rpc_name)
-          end
-
-          unless client
-            raise "could not determine Twirp::Client for call to: #{service_full_name}/#{rpc_name}"
-          end
-
-          client.class.rpcs
+        if msg_class.nil?
+          raise "could not determine Twirp::Client for request: #{request}"
         end
 
-        rpcs[rpc_name]
-      end
-
-      def generate_http_response(msg_class, obj)
         res = case obj
         when nil
           msg_class.new
