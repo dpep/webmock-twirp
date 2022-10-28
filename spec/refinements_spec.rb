@@ -169,34 +169,23 @@ describe WebMock::Twirp::Refinements do
   end
 
   describe "WebMock::RequestSignature" do
-    let(:client) { EchoClient.new("http://localhost/twirp") }
-    let(:twirp_request) { EchoRequest.new(msg: "woof") }
-    let(:request) do
-      stub_twirp_request
-      client.echo(twirp_request)
+    describe "#proto_headers?" do
+      subject { request.proto_headers? }
 
-      WebMock::RequestRegistry.instance.requested_signatures.select { true }.first.first
-    end
+      let(:request) { capture_request { make_call.call } }
 
-    describe "#twirp_client" do
-      subject { request.twirp_client }
+      context "when Twirp request" do
+        let(:client) { EchoClient.new("http://localhost/twirp") }
+        let(:make_call) { client.echo(msg: "woof") }
 
-      it { is_expected.to be < ::Twirp::Client }
-      it { is_expected.to be EchoClient }
-    end
+        it { is_expected.to be true }
+      end
 
-    describe "#twirp_rpc" do
-      subject { request.twirp_rpc }
+      context "when regular request" do
+        let(:make_call) { Faraday.get('http://example.com') }
 
-      it { is_expected.to be_a(Hash) }
-      it { is_expected.to eq(EchoClient.rpcs["Echo"]) }
-    end
-
-    describe "#twirp_request" do
-      subject { request.twirp_request }
-
-      it { is_expected.to be_a(EchoRequest) }
-      it { is_expected.to eq(twirp_request) }
+        it { is_expected.to be false }
+      end
     end
   end
 end

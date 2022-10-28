@@ -1,11 +1,15 @@
 require "google/protobuf"
 require "twirp"
 require "webmock"
+require "webmock/twirp/error"
 require "webmock/twirp/matchers"
 require "webmock/twirp/refinements"
+require "webmock/twirp/request_body_diff"
+require "webmock/twirp/request_signature"
+require "webmock/twirp/request_signature_snippet"
 require "webmock/twirp/request_stub"
+require "webmock/twirp/stub_request_snippet"
 require "webmock/twirp/version"
-
 
 module WebMock
   module Twirp

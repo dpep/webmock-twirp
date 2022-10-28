@@ -85,6 +85,10 @@ describe "stub_twirp_request" do
         expect(stub).to have_been_requested.twice
       end
 
+      it "can handle ruby method names" do
+        @stub = stub_twirp_request(:echo)
+      end
+
       it "supports both client and rpc method name" do
         @stub = stub_twirp_request(client, :Echo)
 
@@ -93,18 +97,29 @@ describe "stub_twirp_request" do
         end
       end
 
-      it "can handle rpc ruby method names if client is provided" do
+      it "supports both client and ruby method name" do
         @stub = stub_twirp_request(client, :echo)
+
+        expect_stub_failure do
+          other_client.echo(request)
+        end
       end
 
-      it "can not handle rpc ruby method names if client is not provided" do
-        stub_twirp_request(:echo)
+      it "only stubs the specified rpc method" do
+        stub_twirp_request(:Double)
+        stub_twirp_request(:double)
         expect_stub_failure
       end
 
-      it "only stubs one rpc method" do
-        stub_twirp_request(client, :double)
+      it "handles unknown rpcs gracefully" do
+        stub_twirp_request(:foo)
         expect_stub_failure
+      end
+
+      it "catches erroneous rpc names when client is provided" do
+        expect {
+          stub_twirp_request(EchoClient, :foo)
+        }.to raise_error(ArgumentError)
       end
     end
   end

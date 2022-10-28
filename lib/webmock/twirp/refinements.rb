@@ -76,29 +76,6 @@ module WebMock
         def proto_headers?
           !!(headers&.fetch("Content-Type", nil)&.start_with?(::Twirp::Encoding::PROTO))
         end
-
-        def twirp_client
-          @twirp_client ||= begin
-            service_full_name, rpc_name = uri.path.split("/").last(2)
-
-            # find matching client
-            client = ObjectSpace.each_object(::Twirp::Client.singleton_class).find do |obj|
-              next unless obj < ::Twirp::Client && obj.name
-              obj.service_full_name == service_full_name && obj.rpcs.key?(rpc_name)
-            end
-          end
-        end
-
-        def twirp_rpc
-          @twirp_rpc ||= begin
-            rpc_name = uri.path.split("/").last
-            client = twirp_client.rpcs[rpc_name] if twirp_client
-          end
-        end
-
-        def twirp_request
-          twirp_rpc[:input_class].decode(body) if twirp_rpc
-        end
       end
     end
   end

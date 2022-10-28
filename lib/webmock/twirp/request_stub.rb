@@ -3,6 +3,8 @@ module WebMock
     class RequestStub < WebMock::RequestStub
       using Refinements
 
+      attr_reader :twirp_client, :rpc_name, :with_attrs
+
       def initialize(*filters)
         rpc_name = filters.snag { |x| x.is_a?(Symbol) }
 
@@ -25,15 +27,11 @@ module WebMock
         end
 
         if klass
-          @rpcs = klass.rpcs
+          @twirp_client = klass
           uri += "/#{klass.service_full_name}"
-        else
-          uri += "/[^/]+"
-        end
 
-        if rpc_name
-          if klass
-            # kindly convert ruby method to rpc method name
+          if rpc_name
+            # type check and kindly convert ruby method to rpc method name
             rpc_info = klass.rpcs.values.find do |x|
               x[:rpc_method] == rpc_name || x[:ruby_method] == rpc_name
             end
@@ -41,19 +39,29 @@ module WebMock
             raise ArgumentError, "invalid rpc method: #{rpc_name}" unless rpc_info
 
             uri += "/#{rpc_info[:rpc_method]}"
-          else
-            uri += "/#{rpc_name}"
           end
-        else
-          uri += "/[^/]+"
         end
 
-        super(:post, /#{uri}$/)
+        super(:post, /#{uri}/)
 
         # filter on Twirp header
         @request_pattern.with(
           headers: { "Content-Type" => ::Twirp::Encoding::PROTO },
         )
+
+        if rpc_name
+          # match rpc dynamically after client resolves
+          @rpc_name = rpc_name
+
+          @request_pattern.with do |request|
+            rpc_info = request.twirp_rpc
+
+            !!rpc_info && (
+              rpc_info[:rpc_method] == rpc_name ||
+              rpc_info[:ruby_method] == rpc_name
+            )
+          end
+        end
       end
 
       def with(request = nil, **attrs, &block)
@@ -69,15 +77,31 @@ module WebMock
           { body: request.to_proto }
         end
 
-        decoder = ->(request_signature) do
-          request = request_signature.twirp_request
+        # save for diffing
+        @with_attrs = if block_given?
+          block
+        elsif request
+          request
+        elsif attrs.any?
+          attrs
+        end
 
-          matched = !!request
-          matched &&= request.include?(attrs) if attrs.any?
-          matched &&= block.call(request) if block
+        decoder = ->(request_signature) do
+          matched = true
+
+          request = request_signature.twirp_request
+          matched &&= !!request
+
+          # match request attributes
+          if attrs.any?
+            matched &&= request.include?(attrs)
+          end
+
+          # match block
+          matched &&= block.call(request) if block_given?
 
           matched
-        end if attrs.any? || block_given?
+        end
 
         super(request_matcher || {}, &decoder)
       end
