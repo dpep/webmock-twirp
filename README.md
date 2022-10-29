@@ -97,6 +97,47 @@ stub_twirp_request.to_return do |request|
 end
 ```
 
+## Why?
+
+### Make WebMock Errors Great Again!
+Before
+```ruby
+> client = EchoClient.new("http://example.com/twirp")
+...
+> client.echo(msg: "Hi")
+/lib/webmock/http_lib_adapters/net_http.rb:104:in `request': Real HTTP connections are disabled. Unregistered request: 
+POST http://example.com/twirp/Echo/Echo with body ' (WebMock::NetConnectNotAllowedError)
+Hi' with headers {'Accept'=>'*/*', 'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3', 'Content-Type'=>'application/protobuf', 'User-Agent'=>'Faraday v1.10.2'}
+
+You can stub this request with the following snippet:
+
+stub_request(:post, "http://example.com/twirp/Echo/Echo").
+  with(
+    body: "\n\x02Hi",
+    headers: {
+       'Accept'=>'*/*',
+       'Accept-Encoding'=>'gzip;q=1.0,deflate;q=0.6,identity;q=0.3',
+       'Content-Type'=>'application/protobuf',
+       'User-Agent'=>'Faraday v1.10.2'
+    }).
+  to_return(status: 200, body: "", headers: {})
+```
+
+After
+```ruby
+> require "webmock-twirp"
+> client = EchoClient.new("http://example.com/twirp")
+...
+> client.echo(msg: "Hi")
+/lib/webmock/http_lib_adapters/net_http.rb:104:in `request': Real Twirp connections are disabled. Unregistered request: 
+EchoClient(http://example.com/twirp/Echo/Echo).echo(msg: "Hi") (WebMock::NetConnectNotAllowedError)
+
+You can stub this request with the following snippet:
+
+stub_twirp_request(:echo).with(
+  msg: "Hi",
+).to_return(...)
+```
 
 ----
 ## Contributing
