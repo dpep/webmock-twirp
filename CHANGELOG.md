@@ -1,3 +1,8 @@
+###  v0.3.0  (2022-10-28)
+- twirpify all the things
+- improve refinements
+- make_twirp_request rspec matcher
+
 ###  v0.2.1  (2022-10-19)
 - fix client matching
 
