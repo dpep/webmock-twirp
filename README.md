@@ -97,9 +97,7 @@ stub_twirp_request.to_return do |request|
 end
 ```
 
-## Why?
-
-### Make WebMock Errors Great Again!
+## Make WebMock Errors Great Again!
 Before
 ```ruby
 > client = EchoClient.new("http://example.com/twirp")
