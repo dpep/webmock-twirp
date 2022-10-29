@@ -9,7 +9,8 @@ module WebMock
         snippet = WebMock::RequestSignatureSnippet.new(@request_signature)
 
         text = [
-          "Real Twirp connections are disabled. Unregistered request: #{@request_signature}",
+          "Real Twirp connections are disabled. Unregistered request:",
+          @request_signature,
           snippet.stubbing_instructions,
           snippet.request_stubs,
           "="*60
