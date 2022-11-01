@@ -1,3 +1,5 @@
+require "uri"
+
 module WebMock
   module Twirp
     class RequestStub < WebMock::RequestStub
@@ -10,16 +12,24 @@ module WebMock
 
         client = filters.snag { |x| x.is_a?(::Twirp::Client) }
 
+        uri = filters.snag do |x|
+          x.is_a?(String) && x.start_with?("http") && x =~ URI::regexp
+        end
+
         klass = client&.class
         klass ||= filters.snag do |x|
           x.is_a?(Class) && (x < ::Twirp::Client || x < ::Twirp::Service)
+        end
+
+        if client && uri
+          raise ArgumentError, "specify uri or client instance, but not both"
         end
 
         unless filters.empty?
           raise ArgumentError, "unexpected arguments: #{filters}"
         end
 
-        uri = ""
+        uri ||= ""
 
         if client
           conn = client.instance_variable_get(:@conn)

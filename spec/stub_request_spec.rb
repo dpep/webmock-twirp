@@ -61,6 +61,20 @@ describe "stub_twirp_request" do
       expect(stub).to have_been_requested.twice
     end
 
+    context "when a uri is specified" do
+      let(:uri) { "http://localhost/twirp" }
+
+      it { @stub = stub_twirp_request(uri) }
+      it { @stub = stub_twirp_request(uri, EchoClient) }
+      it { @stub = stub_twirp_request(uri, :echo) }
+
+      it "does not permit client also" do
+        expect {
+          stub_twirp_request(uri, client)
+        }.to raise_error(ArgumentError)
+      end
+    end
+
     it "catches bogus input" do
       expect {
         stub_twirp_request(Object)
