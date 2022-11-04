@@ -8,17 +8,36 @@ module WebMock
       attr_reader :twirp_client, :rpc_name, :with_attrs
 
       def initialize(*filters)
-        rpc_name = filters.snag { |x| x.is_a?(Symbol) }
-
         client = filters.snag { |x| x.is_a?(::Twirp::Client) }
-
-        uri = filters.snag do |x|
-          x.is_a?(String) && x.start_with?("http") && x =~ URI::regexp
-        end
 
         klass = client&.class
         klass ||= filters.snag do |x|
           x.is_a?(Class) && (x < ::Twirp::Client || x < ::Twirp::Service)
+        end
+
+        unless klass
+          # check for unquaified client class name
+          filters.snag do |filter|
+            next unless filter.is_a?(Symbol)
+
+            clients = ObjectSpace.each_object(::Twirp::Client.singleton_class).select do |obj|
+              next unless obj < ::Twirp::Client
+
+              obj.to_s.split("::").last == filter.to_s
+            end
+
+            if clients.count > 1
+              raise ArgumentError, "`#{filter}` is ambiguous, be more specific: #{clients}"
+            end
+
+            klass = clients.first
+          end
+        end
+
+        rpc_name = filters.snag { |x| x.is_a?(Symbol) }
+
+        uri = filters.snag do |x|
+          x.is_a?(String) && x.start_with?("http") && x =~ URI::regexp
         end
 
         if client && uri

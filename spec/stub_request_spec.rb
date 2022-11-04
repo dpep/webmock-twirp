@@ -89,6 +89,33 @@ describe "stub_twirp_request" do
       end
     end
 
+    context "when a client name is specified" do
+      module Example
+        class Client < EchoClient; end
+        class DupClient < EchoClient; end
+
+        module Two
+          class DupClient < EchoClient; end
+        end
+      end
+
+      it "finds the client class" do
+        stub = stub_twirp_request(:EchoClient)
+        expect(stub.twirp_client).to be EchoClient
+      end
+
+      it "finds a partially qualified client class" do
+        stub = stub_twirp_request(:Client)
+        expect(stub.twirp_client).to be Example::Client
+      end
+
+      it "requires more specificity if there is ambiguity" do
+        expect {
+          stub_twirp_request(:DupClient)
+        }.to raise_error(ArgumentError, /ambiguous/)
+      end
+    end
+
     context "when a specific rpc method is specified" do
       it "stubs a specific twirp request" do
         stub = stub_twirp_request(:Echo)
@@ -134,6 +161,14 @@ describe "stub_twirp_request" do
         expect {
           stub_twirp_request(EchoClient, :foo)
         }.to raise_error(ArgumentError)
+      end
+
+      it "works with client class name" do
+        @stub = stub_twirp_request(:EchoClient, :echo)
+      end
+
+      it "works with client class name out of order" do
+        @stub = stub_twirp_request(:echo, :EchoClient)
       end
     end
   end
