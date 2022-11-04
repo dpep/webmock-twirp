@@ -5,8 +5,6 @@ module WebMock
     class RequestStub < WebMock::RequestStub
       using Refinements
 
-      attr_reader :twirp_client, :rpc_name, :with_attrs
-
       def initialize(*filters)
         client = filters.snag { |x| x.is_a?(::Twirp::Client) }
 
@@ -163,6 +161,9 @@ module WebMock
       def to_return_json(*)
         raise NotImplementedError
       end
+
+      # for internal, package use only
+      attr_reader :twirp_client, :rpc_name, :with_attrs
 
       private
 
