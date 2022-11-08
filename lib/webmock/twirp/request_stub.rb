@@ -13,25 +13,6 @@ module WebMock
           x.is_a?(Class) && (x < ::Twirp::Client || x < ::Twirp::Service)
         end
 
-        unless klass
-          # check for unquaified client class name
-          filters.snag do |filter|
-            next unless filter.is_a?(Symbol)
-
-            clients = ObjectSpace.each_object(::Twirp::Client.singleton_class).select do |obj|
-              next unless obj < ::Twirp::Client
-
-              obj.to_s.split("::").last == filter.to_s
-            end
-
-            if clients.count > 1
-              raise ArgumentError, "`#{filter}` is ambiguous, be more specific: #{clients}"
-            end
-
-            klass = clients.first
-          end
-        end
-
         rpc_name = filters.snag { |x| x.is_a?(Symbol) }
 
         uri = filters.snag do |x|
