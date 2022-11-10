@@ -17,7 +17,7 @@ describe WebMock::Twirp::Refinements do
     end
   end
 
-  describe "MessageExt#normalized_hash?" do
+  describe "MessageExt#normalized_hash" do
     it "discards default values" do
       expect(EchoRequest.new.normalized_hash).to eq({})
     end
