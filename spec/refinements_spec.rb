@@ -30,12 +30,6 @@ describe WebMock::Twirp::Refinements do
       expect(EchoRequest.new(msg: "hi").normalized_hash).to eq(msg: "hi")
     end
 
-    it "can stringify keys" do
-      expect(
-        EchoRequest.new(msg: "hi").normalized_hash(symbolize_keys: false)
-      ).to eq("msg" => "hi")
-    end
-
     context "with ComplexMessage" do
       it "discards default values" do
         expect(ComplexMessage.new.normalized_hash).to eq({})
@@ -67,10 +61,6 @@ describe WebMock::Twirp::Refinements do
         )
 
         expect(msg.normalized_hash).to eq(date: { type: :DATE_BDAY })
-
-        expect(msg.normalized_hash(symbolize_keys: false)).to eq(
-          "date" => { "type" => :DATE_BDAY },
-        )
       end
     end
   end
