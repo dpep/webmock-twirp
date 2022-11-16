@@ -166,6 +166,8 @@ module WebMock
           end
 
           obj
+        when ::Twirp::ClientResp
+          obj.error || obj.data
         when ::Twirp::Error
           obj
         when Symbol

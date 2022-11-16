@@ -297,11 +297,31 @@ describe "stub_twirp_request" do
         expect(rpc.data.msg).to eq response.msg
       end
 
+      context "with a Twirp::ClientResp" do
+        it "repackages proto messages" do
+          stub_twirp_request.to_return(
+            Twirp::ClientResp.new(response, nil)
+          )
+
+          expect(rpc.data).to eq(response)
+          expect(rpc.error).to be nil
+        end
+
+        it "repackages errors" do
+          stub_twirp_request.to_return(
+            Twirp::ClientResp.new(nil, error)
+          )
+
+          expect(rpc.data).to be nil
+          expect(rpc.error).to be_a(Twirp::Error)
+          expect(rpc.error.to_h).to eq(error.to_h)
+        end
+      end
+
       it "supports Twirp errors" do
         @stub = stub_twirp_request.to_return { error }
         expect(rpc.error).to be_a(Twirp::Error)
-        expect(rpc.error.code).to be error.code
-        expect(rpc.error.msg).to eq error.msg
+        expect(rpc.error.to_h).to eq(error.to_h)
       end
 
       it "supports Twirp error codes" do
