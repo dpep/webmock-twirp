@@ -1,3 +1,9 @@
+###  v0.4.0  (2022-11-16)
+- .to_return(Twirp::ClientResp)
+- revert client class name filter
+- unqualified client class filter
+- uri matching
+
 ###  v0.3.0  (2022-10-28)
 - twirpify all the things
 - improve refinements
