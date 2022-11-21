@@ -7,14 +7,14 @@ module WebMock
         end
 
         def method_missing(name, *args, **kwargs, &block)
-          super unless respond_to?(name)
+          return super unless respond_to_missing?(name)
           @stub.send(name, *args, **kwargs, &block)
 
           self
         end
 
-        def respond_to?(method_name, include_private = false)
-          super || @stub.respond_to?(method_name)
+        def respond_to_missing?(method_name, include_private = false)
+          @stub.respond_to?(method_name)
         end
 
         def matches?(block)
