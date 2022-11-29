@@ -41,10 +41,11 @@ GEM
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
     google-protobuf (3.21.9-x86_64-darwin)
+    google-protobuf (3.21.9-x86_64-linux)
     hashdiff (1.0.1)
     multipart-post (2.2.3)
     public_suffix (5.0.0)
-    rack (3.0.0)
+    rack (3.0.1)
     rexml (3.2.5)
     rspec (3.11.0)
       rspec-core (~> 3.11.0)
@@ -78,6 +79,7 @@ GEM
 PLATFORMS
   x86_64-darwin-20
   x86_64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
   byebug
