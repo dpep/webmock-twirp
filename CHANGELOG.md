@@ -1,3 +1,10 @@
+###  v0.4.1  (2022-12-15)
+- protobuf type support
+- gemspec cleanup
+- build upgrade
+- dependabot
+- respond to improvement
+
 ###  v0.4.0  (2022-11-16)
 - .to_return(Twirp::ClientResp)
 - revert client class name filter
