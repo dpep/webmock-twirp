@@ -243,6 +243,12 @@ describe "stub_twirp_request" do
       expect(rpc.data.msg).to eq response.msg
     end
 
+    it "supports proto message types" do
+      @stub = stub_twirp_request.to_return(EchoResponse)
+      expect(rpc.data).to be_a(EchoResponse)
+      expect(rpc.data.msg).to be_empty
+    end
+
     it "supports Twirp errors" do
       @stub = stub_twirp_request.to_return(error)
       expect(rpc.error).to be_a(Twirp::Error)
@@ -367,7 +373,7 @@ describe "stub_twirp_request" do
 
       it "catches bogus responses" do
         stub_twirp_request.to_return(Object)
-        check_for(ArgumentError, /Object/)
+        check_for(TypeError, /Object/)
       end
 
       it "does not permit a response and block" do

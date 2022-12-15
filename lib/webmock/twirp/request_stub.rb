@@ -182,6 +182,12 @@ module WebMock
           else
             raise ArgumentError, "invalid http error status: #{obj}"
           end
+        when Class
+          unless obj == msg_class
+            raise TypeError, "Expected type #{msg_class}, found #{obj}"
+          end
+
+          obj.new
         else
           raise ArgumentError, "can not generate twirp reponse from: #{obj}"
         end
