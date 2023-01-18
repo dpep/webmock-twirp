@@ -24,7 +24,7 @@ GEM
     google-protobuf (3.21.12)
     hashdiff (1.0.1)
     public_suffix (5.0.1)
-    rack (3.0.3)
+    rack (3.0.4.1)
     rexml (3.2.5)
     rspec (3.12.0)
       rspec-core (~> 3.12.0)
