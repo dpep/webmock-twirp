@@ -44,6 +44,8 @@ stub_twirp_request.and_return do |request|
 end
 ```
 
+For additional RSpec support, see [rspec-twirp](https://github.com/dpep/rspec-twirp).
+
 
 ## Usage
 
