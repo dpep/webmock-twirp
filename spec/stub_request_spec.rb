@@ -306,7 +306,7 @@ describe "stub_twirp_request" do
       context "with a Twirp::ClientResp" do
         it "repackages proto messages" do
           stub_twirp_request.to_return(
-            Twirp::ClientResp.new(response, nil)
+            Twirp::ClientResp.new(data: response)
           )
 
           expect(rpc.data).to eq(response)
@@ -315,7 +315,7 @@ describe "stub_twirp_request" do
 
         it "repackages errors" do
           stub_twirp_request.to_return(
-            Twirp::ClientResp.new(nil, error)
+            Twirp::ClientResp.new(error: error)
           )
 
           expect(rpc.data).to be nil
