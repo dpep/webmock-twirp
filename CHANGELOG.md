@@ -1,3 +1,7 @@
+###  v0.4.2  (2023-04-05)
+- ruby 2 compatibility
+- twirp 1.10 compatibility
+
 ###  v0.4.1  (2022-12-15)
 - protobuf type support
 - gemspec cleanup
