@@ -77,6 +77,12 @@ module WebMock
           raise ArgumentError, "specify request or attrs, but not both"
         end
 
+        # support Ruby 2 style attributes-as-hash instead of kwargs
+        if request.is_a?(Hash)
+          attrs = request
+          request = nil
+        end
+
         request_matcher = if request
           unless request.is_a?(Google::Protobuf::MessageExts)
             raise TypeError, "Expected request to be Protobuf::MessageExts, found: #{request}"

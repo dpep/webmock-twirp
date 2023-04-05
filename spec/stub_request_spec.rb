@@ -164,6 +164,10 @@ describe "stub_twirp_request" do
       expect_stub_failure
     end
 
+    it "supports Ruby 2 style attributes-as-hash instead of kwargs" do
+      @stub = stub_twirp_request.with({ msg: "woof" })
+    end
+
     it "does not permit a request and attrs" do
       expect {
         stub_twirp_request.with(request, **request.to_h)
