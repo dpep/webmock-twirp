@@ -3,7 +3,7 @@ WebMock::Twirp
 ![Gem](https://img.shields.io/gem/dt/webmock-twirp?style=plastic)
 [![codecov](https://codecov.io/gh/dpep/webmock-twirp/branch/main/graph/badge.svg)](https://codecov.io/gh/dpep/webmock-twirp)
 
-Twirp support for [WebMock](https://github.com/bblimke/webmock).  All our favorite http request stubbing for Twirp RPCs - message and error serialization done automatically.
+Twirp support for [WebMock](https://github.com/bblimke/webmock).  All our favorite http request stubbing for [Twirp](https://github.com/twitchtv/twirp) RPCs - message and error serialization done automatically.
 
 ###  Install
 ```ruby
