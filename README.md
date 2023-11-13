@@ -44,8 +44,6 @@ stub_twirp_request.and_return do |request|
 end
 ```
 
-For additional RSpec support, see [rspec-twirp](https://github.com/dpep/rspec-twirp).
-
 
 ## Usage
 
@@ -98,6 +96,16 @@ stub_twirp_request.to_return do |request|
   end
 end
 ```
+
+## RSpec
+```ruby
+stub = stub_twirp_request
+# ... make requests ...
+expect(stub).to have_been_requested
+```
+
+For Twirp specific RSpec matchers, see [rspec-twirp](https://github.com/dpep/rspec-twirp)
+
 
 ## Improved WebMock Errors
 Before
