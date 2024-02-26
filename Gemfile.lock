@@ -55,7 +55,7 @@ GEM
     twirp (1.10.0)
       faraday (< 3)
       google-protobuf (~> 3.0, >= 3.7.0)
-    webmock (3.20.0)
+    webmock (3.23.0)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
