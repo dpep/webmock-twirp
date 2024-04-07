@@ -1,3 +1,7 @@
+###  v0.5.0  (2024-04-07)
+- codecov upgrade
+- drop ruby 2.7 (#65)
+
 ###  v0.4.2  (2023-04-05)
 - ruby 2 compatibility
 - twirp 1.10 compatibility
