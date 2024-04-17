@@ -1,3 +1,6 @@
+###  v0.5.1  (2024-04-17)
+- fix rpc name matching
+
 ###  v0.5.0  (2024-04-07)
 - codecov upgrade
 - drop ruby 2.7 (#65)
