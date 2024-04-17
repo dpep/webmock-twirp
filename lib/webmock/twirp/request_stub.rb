@@ -61,14 +61,7 @@ module WebMock
           # match rpc dynamically after client resolves
           @rpc_name = rpc_name
 
-          @request_pattern.with do |request|
-            rpc_info = request.twirp_rpc
-
-            !!rpc_info && (
-              rpc_info[:rpc_method] == rpc_name ||
-              rpc_info[:ruby_method] == rpc_name
-            )
-          end
+          with
         end
       end
 
@@ -105,6 +98,16 @@ module WebMock
 
           request = request_signature.twirp_request
           matched &&= !!request
+
+          # match rpc_name
+          if @rpc_name
+            rpc_info = request_signature.twirp_rpc
+
+            matched &&= !!rpc_info && (
+              rpc_info[:rpc_method] == @rpc_name ||
+              rpc_info[:ruby_method] == @rpc_name
+            )
+          end
 
           # match request attributes
           if attrs.any?

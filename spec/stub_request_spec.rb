@@ -139,6 +139,16 @@ describe "stub_twirp_request" do
       it "works with client and rpc are out of order" do
         @stub = stub_twirp_request(:echo, EchoClient)
       end
+
+      it "calls `with` block if rpc method matches" do
+        @stub = stub_twirp_request(:echo).with { true }
+      end
+
+      it "does not call `with` block unless rpc method matches" do
+        stub_twirp_request(:double).with { raise }
+
+        expect_stub_failure
+      end
     end
   end
 
