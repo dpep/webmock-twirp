@@ -14,3 +14,4 @@ updates:
       interval: "weekly"
     pull-request-branch-name:
       separator: "-"
+    versioning-strategy: lockfile-only
