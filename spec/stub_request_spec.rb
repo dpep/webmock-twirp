@@ -165,10 +165,15 @@ describe "stub_twirp_request" do
       @stub = stub_twirp_request.with(request)
     end
 
+    it "matches proto message type" do
+      @stub = stub_twirp_request.with(EchoRequest)
+    end
+
     it "does not stub mismatches" do
       stub_twirp_request.with(msg: "rav")
       stub_twirp_request.with(msg: /rav/)
       stub_twirp_request.with(EchoRequest.new)
+      stub_twirp_request.with(EchoResponse)
       stub_twirp_request.with { false }
 
       expect_stub_failure
@@ -187,7 +192,18 @@ describe "stub_twirp_request" do
     it "type checks the request param" do
       expect {
         stub_twirp_request.with(Object)
-      }.to raise_error(TypeError, /to be Protobuf::MessageExts/)
+      }.to raise_error(TypeError, /to be a Protobuf::MessageExts/)
+    end
+
+    context "with rspec matchers" do
+      it "supports be_a" do
+        @stub = stub_twirp_request.with(be_a(EchoRequest))
+      end
+
+      it "supports have_attributes" do
+        # should probably just use `with(msg: "woof")`
+        @stub = stub_twirp_request.with(have_attributes(msg: "woof"))
+      end
     end
 
     context "with block mode" do
@@ -212,7 +228,7 @@ describe "stub_twirp_request" do
       end
     end
 
-    context "with rspec matchers" do
+    context "with attribute rspec matchers" do
       it { @stub = stub_twirp_request.with(msg: eq("woof")) }
       it { @stub = stub_twirp_request.with(msg: start_with("w")) }
       it { @stub = stub_twirp_request.with(msg: include("oo")) }
