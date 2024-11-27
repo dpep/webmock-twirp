@@ -197,6 +197,7 @@ describe "stub_twirp_request" do
 
     context "with rspec matchers" do
       it "supports be_a" do
+        # should probably just use `with(EchoRequest)`
         @stub = stub_twirp_request.with(be_a(EchoRequest))
       end
 
