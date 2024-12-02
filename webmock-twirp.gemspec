@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.add_dependency "webmock", ">= 3"
   s.add_dependency "twirp", ">= 1"
 
-  s.add_development_dependency "byebug"
+  s.add_development_dependency "debug"
   s.add_development_dependency "rack"
   s.add_development_dependency "rspec"
   s.add_development_dependency "simplecov"
