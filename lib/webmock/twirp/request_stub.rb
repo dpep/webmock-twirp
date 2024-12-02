@@ -77,11 +77,17 @@ module WebMock
         end
 
         request_matcher = if request
-          unless request.is_a?(Google::Protobuf::MessageExts)
-            raise TypeError, "Expected request to be Protobuf::MessageExts, found: #{request}"
+          if request.is_a?(Google::Protobuf::MessageExts)
+            # match message type and contents
+            RSpec::Matchers::BuiltIn::Eq.new(request)
+          elsif request.is_a?(Class) && request < Google::Protobuf::MessageExts
+            # match message type
+            RSpec::Matchers::BuiltIn::BeAKindOf.new(request)
+          elsif request.is_a?(RSpec::Matchers::BuiltIn::BaseMatcher)
+            request
+          else
+            raise TypeError, "Expected request to be a Protobuf::MessageExts, found: #{request}"
           end
-
-          { body: request.to_proto }
         end
 
         # save for diffing
@@ -93,11 +99,15 @@ module WebMock
           attrs
         end
 
-        decoder = ->(request_signature) do
+        super() do |request_signature|
           matched = true
 
           request = request_signature.twirp_request
           matched &&= !!request
+
+          if request_matcher
+            matched &&= request_matcher.matches?(request)
+          end
 
           # match rpc_name
           if @rpc_name
@@ -119,8 +129,6 @@ module WebMock
 
           matched
         end
-
-        super(request_matcher || {}, &decoder)
       end
 
       def to_return(*responses, &block)
