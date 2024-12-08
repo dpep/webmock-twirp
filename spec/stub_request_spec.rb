@@ -407,6 +407,11 @@ describe "stub_twirp_request" do
         check_for(TypeError, /Object/)
       end
 
+      it "catches unsupported input" do
+        stub_twirp_request.to_return(1.0)
+        check_for(ArgumentError, /can not generate twirp response/)
+      end
+
       it "does not permit a response and block" do
         expect {
           stub_twirp_request.to_return(response) { 500 }
