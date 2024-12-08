@@ -206,7 +206,7 @@ module WebMock
 
           obj.new
         else
-          raise ArgumentError, "can not generate twirp reponse from: #{obj}"
+          raise ArgumentError, "can not generate twirp response from: #{obj}"
         end
 
         if res.is_a?(Google::Protobuf::MessageExts)
