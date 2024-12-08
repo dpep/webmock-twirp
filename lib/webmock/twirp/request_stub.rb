@@ -79,12 +79,15 @@ module WebMock
         request_matcher = if request
           if request.is_a?(Google::Protobuf::MessageExts)
             # match message type and contents
-            RSpec::Matchers::BuiltIn::Eq.new(request)
+            # RSpec::Matchers::BuiltIn::Eq.new(request)
+            ->(expected, actual) { actual == expected }.curry.call(request)
           elsif request.is_a?(Class) && request < Google::Protobuf::MessageExts
             # match message type
-            RSpec::Matchers::BuiltIn::BeAKindOf.new(request)
-          elsif request.is_a?(RSpec::Matchers::BuiltIn::BaseMatcher)
-            request
+            # RSpec::Matchers::BuiltIn::BeAKindOf.new(request)
+            ->(expected, actual) { actual.is_a?(expected) }.curry.call(request)
+          elsif request.respond_to?(:matches?)
+            # is_a?(RSpec::Matchers::BuiltIn::BaseMatcher)
+            ->(expected, actual) { expected.matches?(actual) }.curry.call(request)
           else
             raise TypeError, "Expected request to be a Protobuf::MessageExts, found: #{request}"
           end
@@ -106,7 +109,7 @@ module WebMock
           matched &&= !!request
 
           if request_matcher
-            matched &&= request_matcher.matches?(request)
+            matched &&= request_matcher.call(request)
           end
 
           # match rpc_name
