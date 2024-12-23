@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    webmock-twirp (0.5.1)
+    webmock-twirp (0.0.1)
       twirp (>= 1)
       webmock (>= 3)
 
@@ -15,7 +15,7 @@ GEM
       bigdecimal
       rexml
     date (3.4.1)
-    debug (1.9.2)
+    debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
     diff-lcs (1.5.1)
@@ -29,21 +29,21 @@ GEM
     google-protobuf (3.25.3)
     hashdiff (1.1.2)
     io-console (0.8.0)
-    irb (1.14.1)
+    irb (1.14.3)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.9.0)
     logger (1.6.2)
     net-http (0.6.0)
       uri
-    psych (5.2.1)
+    psych (5.2.2)
       date
       stringio
     public_suffix (6.0.1)
     rack (3.1.8)
-    rdoc (6.8.1)
+    rdoc (6.10.0)
       psych (>= 4.0.0)
-    reline (0.5.12)
+    reline (0.6.0)
       io-console (~> 0.5)
     rexml (3.3.9)
     rspec (3.13.0)
