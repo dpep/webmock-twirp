@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    webmock-twirp (0.5.1)
+    webmock-twirp (0.0.1)
       twirp (>= 1)
       webmock (>= 3)
 
@@ -40,7 +40,7 @@ GEM
       date
       stringio
     public_suffix (6.0.1)
-    rack (3.1.8)
+    rack (3.1.9)
     rdoc (6.8.1)
       psych (>= 4.0.0)
     reline (0.5.12)
