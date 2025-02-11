@@ -1,3 +1,7 @@
+###  0.6.0  (2025-02-11)
+- rspec matcher support
+- debug gem
+
 ###  v0.5.1  (2024-04-17)
 - fix rpc name matching
 

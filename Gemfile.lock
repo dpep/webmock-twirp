@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    webmock-twirp (0.5.1)
+    webmock-twirp (0.6.0)
       twirp (>= 1)
       webmock (>= 3)
 
