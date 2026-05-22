@@ -26,7 +26,7 @@ GEM
       logger
     faraday-net_http (3.4.3)
       net-http (~> 0.5)
-    google-protobuf (3.25.3)
+    google-protobuf (3.25.5)
     hashdiff (1.1.2)
     io-console (0.8.0)
     irb (1.15.1)
