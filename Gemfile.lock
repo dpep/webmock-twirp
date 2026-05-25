@@ -10,9 +10,9 @@ GEM
   specs:
     addressable (2.9.0)
       public_suffix (>= 2.0.2, < 8.0)
-    bigdecimal (3.1.9)
+    bigdecimal (4.1.2)
     cgi (0.5.1)
-    crack (1.0.0)
+    crack (1.0.1)
       bigdecimal
       rexml
     date (3.5.1)
@@ -30,7 +30,7 @@ GEM
     faraday-net_http (3.4.3)
       net-http (~> 0.5)
     google-protobuf (3.25.5)
-    hashdiff (1.1.2)
+    hashdiff (1.2.1)
     io-console (0.8.2)
     irb (1.18.0)
       pp (>= 0.6.0)
@@ -56,7 +56,7 @@ GEM
       tsort
     reline (0.6.3)
       io-console (~> 0.5)
-    rexml (3.4.2)
+    rexml (3.4.4)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -83,7 +83,7 @@ GEM
       google-protobuf (>= 3.25, < 5.a)
       rack (>= 2.2.3)
     uri (1.1.1)
-    webmock (3.25.0)
+    webmock (3.26.2)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
