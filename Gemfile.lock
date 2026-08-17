@@ -49,7 +49,7 @@ GEM
       date
       stringio
     public_suffix (6.0.2)
-    rack (3.2.6)
+    rack (3.2.7)
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
