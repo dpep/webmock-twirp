@@ -79,7 +79,7 @@ GEM
     simplecov_json_formatter (0.1.4)
     stringio (3.2.0)
     tsort (0.2.0)
-    twirp (1.13.0)
+    twirp (1.13.1)
       faraday (< 3)
       google-protobuf (>= 3.25, < 5.a)
       rack (>= 2.2.3)
