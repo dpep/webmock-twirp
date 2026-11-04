@@ -50,6 +50,7 @@ GEM
       stringio
     public_suffix (6.0.2)
     rack (3.2.8)
+    rake (13.4.2)
     rdoc (7.2.0)
       erb
       psych (>= 4.0.0)
@@ -95,6 +96,7 @@ PLATFORMS
 DEPENDENCIES
   debug
   rack
+  rake
   rspec
   simplecov
   webmock-twirp!
