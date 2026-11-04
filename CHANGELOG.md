@@ -1,3 +1,6 @@
+## Unreleased
+- Requires Ruby 3.2 or newer.
+
 ###  0.6.0  (2025-02-11)
 - rspec matcher support
 - debug gem
