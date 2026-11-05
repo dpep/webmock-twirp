@@ -114,6 +114,49 @@ describe WebMock::Twirp::Refinements do
       msg = ComplexMessage.new(msg: EchoRequest.new(msg: "Hi"))
       expect(msg).to include_attrs(msg: { msg: /^H/ })
     end
+
+    context "with default values in collections" do
+      subject do
+        ComplexMessage.new(
+          collection: CollectionMessage.new(
+            dates: [ DateMessage.new(month: 10) ],
+            dates_by_name: { "bday" => DateMessage.new(day: 16) },
+          ),
+        )
+      end
+
+      it { is_expected.to include_attrs(collection: include(dates: [ include(year: 0) ])) }
+      it { is_expected.to include_attrs(collection: include(dates_by_name: { "bday" => include(month: 0) })) }
+    end
+  end
+
+  describe ".to_h_with_defaults" do
+    subject { described_class.to_h_with_defaults(msg) }
+
+    let(:msg) do
+      ComplexMessage.new(
+        date: DateMessage.new,
+        collection: CollectionMessage.new(
+          dates: [ DateMessage.new ],
+          dates_by_name: { "bday" => DateMessage.new },
+        ),
+      )
+    end
+    let(:default_date) { { type: :DATE_DEFAULT, month: 0, day: 0, year: 0 } }
+
+    it "keeps default values" do
+      is_expected.to eq(
+        msg: nil,
+        complex: false,
+        date: default_date,
+        uid: 0,
+        uuid: "",
+        collection: {
+          dates: [ default_date ],
+          dates_by_name: { "bday" => default_date },
+        },
+      )
+    end
   end
 
   describe "MessageExt#match?" do

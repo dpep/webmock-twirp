@@ -1,6 +1,25 @@
 module WebMock
   module Twirp
     module Refinements
+      # Message#to_h, but keeping default-valued fields, which google-protobuf 4 drops
+      def self.to_h_with_defaults(value)
+        case value
+        when Google::Protobuf::MessageExts
+          value.class.descriptor.to_h do |field|
+            [ field.name.to_sym, to_h_with_defaults(field.get(value)) ]
+          end
+        when Google::Protobuf::RepeatedField
+          value.map { |x| to_h_with_defaults(x) }
+        when Google::Protobuf::Map
+          # Map#to_h ignores a block
+          res = {}
+          value.each { |k, v| res[k] = to_h_with_defaults(v) }
+          res
+        else
+          value
+        end
+      end
+
       refine Array do
         def snag(&block)
           find(&block)&.tap { |x| delete(x) }
@@ -45,8 +64,7 @@ module WebMock
               if expected_value.is_a?(Hash)
                 matches ||= actual_value.match?(**expected_value)
               else
-                matches ||= expected_value === actual_value.to_h
-                # matches ||= expected_value === actual_value.normalized_hash
+                matches ||= expected_value === Refinements.to_h_with_defaults(actual_value)
               end
             end
 

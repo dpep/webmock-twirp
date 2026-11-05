@@ -32,4 +32,11 @@ message ComplexMessage {
     int32 uid = 5;
     string uuid = 6;
   }
+
+  CollectionMessage collection = 7;
+}
+
+message CollectionMessage {
+  repeated DateMessage dates = 1;
+  map<string, DateMessage> dates_by_name = 2;
 }
