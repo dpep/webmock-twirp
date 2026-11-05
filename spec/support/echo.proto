@@ -1,0 +1,35 @@
+// Regenerate echo_pb.rb (protoc 36.2) from the repo root:
+//   protoc --proto_path=spec/support --ruby_out=spec/support spec/support/echo.proto
+
+syntax = "proto3";
+
+message EchoRequest {
+  string msg = 1;
+}
+
+message EchoResponse {
+  string msg = 1;
+}
+
+enum DateType {
+  DATE_DEFAULT = 0;
+  DATE_BDAY = 1;
+}
+
+message DateMessage {
+  DateType type = 1;
+  int32 month = 2;
+  int32 day = 3;
+  int32 year = 4;
+}
+
+message ComplexMessage {
+  EchoRequest msg = 1;
+  bool complex = 3;
+  DateMessage date = 4;
+
+  oneof id {
+    int32 uid = 5;
+    string uuid = 6;
+  }
+}
