@@ -3,7 +3,7 @@ require_relative "lib/webmock/twirp/version"
 Gem::Specification.new do |s|
   s.authors     = ["Daniel Pepper"]
   s.description = "Twirp support for WebMock"
-  s.files       = `git ls-files * ':!:spec'`.split("\n")
+  s.files       = `git ls-files * ':!:spec' ':!:gemfiles' ':!:Gemfile*' ':!:service.rb'`.split("\n")
   s.homepage    = "https://github.com/dpep/webmock-twirp"
   s.license     = "MIT"
   s.name        = "webmock-twirp"
