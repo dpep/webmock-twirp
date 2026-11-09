@@ -1,4 +1,4 @@
-## Unreleased
+###  0.6.1  (2026-11-08)
 - Requires Ruby 3.2 or newer.
 - Fix nested matchers like `with(date: include(year: 0))` not matching default-valued fields on google-protobuf 4.
 
