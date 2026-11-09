@@ -5,7 +5,7 @@ require "simplecov"
 require "webmock/rspec"
 
 SimpleCov.start do
-  add_filter "/spec/"
+  skip "/spec/"
 end
 
 if ENV["CI"] == "true" || ENV["CODECOV_TOKEN"]

@@ -19,6 +19,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rack"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
-  s.add_development_dependency "simplecov"
+  s.add_development_dependency "simplecov", ">= 1"
   s.add_development_dependency "webrick"
 end

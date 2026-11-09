@@ -93,7 +93,7 @@ DEPENDENCIES
   rack
   rake
   rspec
-  simplecov
+  simplecov (>= 1)
   webmock-twirp!
   webrick
 
