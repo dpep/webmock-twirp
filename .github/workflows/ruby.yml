@@ -13,8 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         ruby-version: [ "3.4", "3.3", "3.2" ]
+        protobuf: [ "3", "4" ]
 
-    name: Ruby ${{ matrix.ruby-version }}
+    name: Ruby ${{ matrix.ruby-version }}${{ matrix.protobuf == '3' && ', protobuf 3' || '' }}
+
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.protobuf == '3' && 'gemfiles/protobuf_3.gemfile' || 'Gemfile' }}
 
     steps:
       - name: clone ${{ github.repository }}

@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "google-protobuf", "~> 3.25"
