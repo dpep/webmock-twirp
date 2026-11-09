@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.summary     = "WebMock::Twirp"
   s.version     = WebMock::Twirp::VERSION
 
-  s.required_ruby_version = ">= 3.2"
+  s.required_ruby_version = ">= 3.3"
 
   s.add_dependency "webmock", ">= 3"
   s.add_dependency "twirp", ">= 1"
