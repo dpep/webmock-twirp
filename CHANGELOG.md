@@ -1,4 +1,4 @@
-## Unreleased
+###  0.6.2  (2026-11-09)
 - Requires Ruby 3.3 or newer.
 
 ###  0.6.1  (2026-11-08)
